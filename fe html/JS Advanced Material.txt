@@ -1,0 +1,649 @@
+Advanced JavaScript Concepts
+
+1.Passing Function into Another Function
+-----------------------------------------
+
+	Example1
+	---------
+
+	function sayHello() {
+    		console.log("Hello");
+	}
+	function execute(fn) {
+    		fn();
+	}
+	execute(sayHello);
+
+	-The receiving function decides WHEN and HOW to execute the function.
+
+
+	Example2
+	--------
+
+	function add() {
+    		console.log("Adding");
+	}
+	function subtract() {
+    		console.log("Subtracting");
+	}
+	function doAdd() { //It is repetative process for Add
+    		add();
+	}
+	function doSubtract() { //It is repetative process for Sub
+    		subtract();
+	}
+
+
+	- instead of that 
+
+	function execute(operation) {
+    		operation();
+	}
+	execute(add);
+	execute(subtract);
+
+
+	- the receiving function can execute it at a specific time or when a particular task is completed.
+	- For this purpose we use the concept callback 
+	- A callback function is a function passed as an argument to another function
+
+
+2. Callback Functions
+-------------------------
+	- A callback function is simply a function that you pass as an argument into another function, to be run (or "called back") later.
+	- Pass a function into another function so it can be executed inside it, that passed-in function is called a callback
+
+	function doTask(callback) {
+    		console.log("Task started");
+    		// Do some task...
+    		callback();   // execute the function when the task is done
+	}
+	function finished() {
+    		console.log("Task finished");
+	}
+	doTask(finished);
+
+	Here:
+
+		finished is a normal function.
+		finished is passed to doTask.
+		doTask decides when to execute finished.
+		Therefore, finished is being used as a callback function.
+
+	- A callback is a function passed to another function to be executed by that function at the appropriate time.
+
+	Example 2
+	----------
+	Download a picture → after the download finishes → display the picture.
+
+	function downloadImage(callback) {
+    		console.log("Downloading photo.jpg...");
+		// Imagine the JPG download happens here
+    		callback();
+	}
+	function displayImage() {
+    		console.log("Displaying photo.jpg 🖼️");
+	}
+	downloadImage(displayImage);
+
+
+	If the picture never downloads, then:
+
+	Download starts
+     		↓
+	Download never finishes
+     		↓
+	callback() is never called
+
+	- So the program waits for the download to finish; it doesn't automatically create an infinite loop.
+	- If the download fails and we don't handle the failure, the callback may never run.
+	-That's where asynchronous operations come in.
+
+3. Synchronous Vs Asynchronous
+----------------------------
+
+Synchronous:
+	- It is line by line exacution
+	- Do one task → wait until it finishes → then do the next task.
+
+	Download JPG
+     	    ↓
+   	  WAIT 
+     	    ↓
+	Download complete
+     	    ↓
+	Display JPG
+     	   ↓
+	Do next task
+
+	- If the download takes 5 seconds, JavaScript would conceptually be blocked waiting for that operation.
+
+Asynchronous
+
+	- Random line execution
+	- Start a task that may take time, and allow other work to continue. When the task finishes, handle the result.
+
+		Start downloading JPG
+        		↓
+   		If it takes more time 
+        		↓
+		Compiler moves to the next line
+        		↓
+		JPG download finishes (compiler come back)
+        		↓
+		Run callback
+        		↓
+		Display JPG 
+	- Here we will use setTimeout function
+
+	Example
+	--------
+
+	function downloadImage(callback) {
+    		console.log("Download started");
+
+    		setTimeout(function() {
+        	console.log("Download completed");
+        	callback();
+    		}, 5000);
+	}
+
+	function displayImage() {
+    		console.log("Displaying JPG");
+	}
+
+	downloadImage(displayImage);
+
+	console.log("Do other work...");
+
+
+Drawback of Callbacks 
+----------------------
+	- In asynchronous operations like downloading an image, we do not know how long the operation will take. It may take 2 seconds, 5 seconds, or even longer depending on the network.
+	- If we use setTimeout(), we are guessing the waiting time.
+
+	Problem:
+
+		- If the image downloads in 2 seconds, we still wait for 5 seconds.
+		- If the image takes 8 seconds, displayImage() runs before the image is ready.
+		- So setTimeout() is not a reliable way to wait for asynchronous operations.
+	
+	Solution:Asynchronous operations
+		
+		1. Promises
+		2. Async and Await (more readable way to work with Promises)
+
+4. Promises
+------------
+	A Promise waits for the asynchronous task to complete instead of waiting for a fixed amount of time.
+
+	Start image download 
+		↓ 
+	Promise waits until download completes 
+		↓ 
+	Image downloaded 
+		↓ 
+	Display image
+
+	- Definition: A Promise is an object that represents the future result of an asynchronous operation.
+	
+
+	     Promise
+   		↓
+	"I am downloading the JPG."
+   		↓
+	    Pending
+   		↓
+       ┌───────────────┐
+       ↓               ↓
+   ✅ Success       ❌ Failure
+       ↓               ↓
+  Fulfilled         Rejected
+
+	- A Promise has three states:
+
+
+	1. pending --> Operation is still happening
+	2. fulfilled --> Operation completed successfully
+	3. rejected -->	Operation failed
+
+	Creating a simple Promise
+	--------------------------
+	let promise = new Promise(function(resolve, reject) {
+
+    		// Some asynchronous operation
+
+    	resolve("Image downloaded");
+
+	});
+
+	- Don't worry about resolve and reject yet.
+		resolve() → SUCCESS 
+		reject()   → FAILURE 
+
+	Getting the result using .then()
+	---------------------------------
+	let promise = new Promise(function(resolve, reject) {
+	    resolve("Image downloaded");
+	});
+	promise.then(function(result) {
+    		console.log(result);
+	});
+
+	Example
+	--------
+
+	function downloadImage() {
+		return new Promise(function(resolve, reject) {
+			console.log("Downloading JPG...");
+        		let success = false;	
+        		if (success) {
+            			resolve("photo.jpg");
+        		} 
+			else {
+            		reject("Download failed");
+        		}
+
+    		});
+	}
+	downloadImage().then(function(image) {
+        	console.log("Display:", image);
+   	 })
+    	.catch(function(error) {
+        	console.log(error);
+    	});
+
+	Promise Functions
+	-----------------
+	promise-download-function()
+    		.then(display) (we can use multiple .then())
+    		.catch(handleError);
+
+
+
+Drawback of Promise .then() chaining
+------------------------------------
+
+	downloadImage()
+    	.then(resizeImage)
+    	.then(saveImage)
+    	.then(displayImage)
+    	.catch(handleError);
+
+	- This is called Promise chaining.
+	- As the number of asynchronous operations increases, the .then() chain can become harder to read.
+	
+	Example
+	-------
+	downloadImage()
+    		.then(function(image) {
+        		return resizeImage(image);
+    		})
+    		.then(function(image) {
+        		return saveImage(image);
+   		 })
+    		.then(function(image) {
+        		return uploadImage(image);
+    		})
+    		.then(function(image) {
+        		displayImage(image);
+    		})
+    		.catch(function(error) {
+        		console.log(error);
+   		 });
+
+	- async/await makes Promise code look simpler
+
+5. Async and Await
+-------------------
+	- async/await is an alternative syntax for working with Promises.
+	- async is a keyword used before a function
+	- This function is asynchronous and will return a Promise
+	- await is a keyword used to wait for a Promise to complete and get its result.
+	- Wait until this Promise finishes, then give me its result.
+
+	- async used to define a function that works with Promises
+		async function function-name() {
+		}
+	-await used inside that function to wait for a Promise:
+		let result = await function-name();
+
+	- async → marks the function
+	- await → waits for a Promise inside the function
+	- await pauses the execution of that async function until the Promise settles, while JavaScript compiler can continue handling other work.
+	
+	Simple Example
+	---------------
+
+	function getData() {
+    		return new Promise(function(resolve) {
+        		setTimeout(function() {
+            		resolve("Data received");
+       		 	}, 3000);
+
+    		});
+	}
+
+	async function showData() {
+    		let result = await getData();
+    		console.log(result);
+	}
+	showData();
+
+	Explanation
+	------------
+	showData()
+    	   ↓
+	await getData()
+    	   ↓
+	Promise is pending
+           ↓
+	3 seconds
+    	   ↓
+	Promise fulfilled
+   	   ↓
+	result = "Data received"
+           ↓
+	console.log(result)
+
+
+	Async/Await Login Example
+	------------------------
+	Username: admin,  Password: admin
+
+	Step 1: Create a login function (It is promise)
+
+	function login(username, password) {
+
+    		return new Promise(function(resolve, reject) {
+
+        	// checking username and password
+       		 setTimeout(function() {
+
+            		if (username === "admin" && password === "admin") {
+                		resolve("Login Success");
+            		} 
+			else 
+			{
+                		reject("Invalid Credentials");
+            		}
+
+        	}, 2000);
+
+    		});
+	}
+
+	Step 2: Use async and await to execute Promise
+	----------------------------------------------
+	async function checkLogin() {
+    		try {
+        		let result = await login("admin", "admin");
+        		console.log(result);
+    		} 
+		catch (error) {
+        		console.log("Invalid Credentials");
+    		}
+	}
+	checkLogin();
+
+	// login("admin", "123"); -->Invalid Credentials
+
+
+	Explanation
+	-----------
+
+	checkLogin() --> it is async function going to execute promise
+	     ↓ 
+	await login() --> waitng for executing login promise 
+	     ↓ 
+	Check credentials --> (executing promise)
+	     ↓ 
+	┌──────────────┐ 
+	↓  	       ↓ 
+     Correct       Incorrect 
+	↓ 	       ↓ 
+   resolve()        reject() 
+        ↓              ↓ 
+  "Login Success"  "Invalid Credentials".
+
+
+	- We can write Promise-based asynchronous in 2 ways:
+
+ 	     login()
+                ↓
+             Promise
+            ↙       ↘
+     .then/.catch   async/await
+
+
+
+6. Fetch API and JSON
+----------------------
+
+Fetch API
+	- Fetch API is a built-in JavaScript API used to send HTTP requests and receive data from a server.
+	- It communicate with a server by sending requests and receiving responses
+	- The browser can communicate with a server using fetch()
+
+	JavaScript
+    	    ↓
+  	fetch()
+    	    ↓
+	HTTP Request
+    	    ↓
+   	Server
+    	    ↓
+ 	HTTP Response
+           ↓
+ 	JavaScript
+
+
+	Syntax
+	-------
+	fetch("url") ---> sends a request to the given URL.
+
+	Important point
+	----------------
+	fetch() returns a Promise.
+
+	Example:
+
+		let result = fetch("https://example.com/data");
+		console.log(result);
+
+	- The result is a Promise because the server may take some time to respond.
+
+		fetch()
+   		   ↓
+		Promise
+   		   ↓
+		Waiting for server
+   		   ↓
+	        Response received
+
+	- we can write fetch using promise (.then() or async/await)
+
+
+	Example Using .then()
+	----------------------
+
+	fetch("https://example.com/data")
+    		.then(function(response) {
+        		console.log(response);
+    	});
+
+	Example Using Async/Await
+	--------------------------
+	async function getData() {
+    		let response = await fetch("https://example.com/data");
+		console.log(response);
+	}
+	getData();
+
+
+
+	Note: 
+		- Response/Output is not the actual data
+		- server sends JSON data
+
+JSON
+----
+	- JSON stands for JavaScript Object Notation
+	- JSON is a common text-based format for exchanging data between a client and a server.
+
+	JSON Format
+	------------
+		
+	{
+    	   "name": "Ravi",
+    	   "age": 25,
+    	   "city": "Vijayawada"
+	}
+
+	JSON vs JavaScript Object
+	-------------------------
+	JavaScript object
+
+	let user = {
+    		name: "Ravi",
+    		age: 25
+	};
+
+
+	JSON
+
+	{
+    	  "name": "Ravi",
+    	  "age": 25
+	}
+
+	- The main difference you'll notice is that JSON uses double quotes around property names and string values.
+
+
+Fetch + JSON
+------------
+	async function getPost() {
+    		let response = await fetch("https://jsonplaceholder.typicode.com/posts/1");
+		let data = await response.json();
+    		console.log(data);
+		console.log("ID:", data.id);
+		console.log("Title:", data.title);
+		console.log("Body:", data.body);
+	}
+	getPost();
+
+
+7. Local Storage and Session Storage
+-------------------------------------
+
+JavaScript provides two commonly used storage mechanisms in the Browser:
+
+	1. Local Storage
+	2. Session Storage
+
+Local Storage:
+--------------
+	- Local Storage is a browser storage mechanism that allows a website to save data in the user's browser so that the data remains available even after refreshing or closing the browser.
+	- It stores data in the browser and keeps it even after the browser or webpage is closed.
+	- It is provided by the browser.
+
+	Example Data
+	-------------
+	Username: Ravi
+	Theme: Dark
+	Language: English
+
+	- localStorage is keyword in the javascript to store data in the browser
+
+  	Localstorage methods
+	---------------------
+
+	1. setItem() ---> Store data
+
+		Syntax: 
+			localStorage.setItem(key, value);
+			localStorage.setItem("username", "Ravi");
+
+	2. getItem() ---> Get data
+
+		After storing the data
+		
+			let username = localStorage.getItem("username");
+			console.log(username);
+
+	3. Remove one item
+	
+		localStorage.removeItem("username"); --> delete one record
+		localStorage.clear(); --> delete everything
+
+	Localstorage Example
+	--------------------
+		localStorage.setItem("username", "Ravi");
+		let username = localStorage.getItem("username");
+		console.log(username);
+
+	- Even close the browser Local Storage still remains.
+
+	- JSON.stringify() used to convert data into JSON format
+
+		localStorage.setItem("user", JSON.stringify(user));
+	
+	- JSON.parse() convert it back into an object
+
+		let userObject = JSON.parse(data);
+		console.log(userObject.name);
+
+	Signup and Login Using Local Storage
+	-------------------------------------
+
+	function signup() 
+	{ 
+		let username = "admin"; 
+		let password = "admin"; 
+		localStorage.setItem("username", username); 
+		localStorage.setItem("password", password); 
+		console.log("Signup successful"); 
+	} 	
+
+	function login(username, password) 
+	{ 
+		let storedUsername = localStorage.getItem("username"); 
+		let storedPassword = localStorage.getItem("password"); 
+		if (username === storedUsername && password === storedPassword) 
+		{ 
+			console.log("Login Success"); 
+		} 
+		else 
+		{ 
+			console.log("Invalid Credentials"); 
+		} 
+	}
+
+	signup();
+
+	login("admin", "admin");
+
+
+Session Storage
+----------------
+	- Session Storage allows a website to store key-value data in the browser for the duration of a page session.	
+	- Session Storage data is removed when the browser tab is closed.
+
+	Browser Tab
+    	   ↓
+       Session Storage
+           ↓
+       Temporary data
+
+	Session Storage Methods
+	-------------------------
+	sessionStorage.setItem("key", "value"); -->Store Data
+	sessionStorage.getItem("key");  --> Get Data
+	sessionStorage.removeItem("key"); --> Remove Item
+	sessionStorage.clear(); --> Remove Clear
+
+	
+
+
+
+	

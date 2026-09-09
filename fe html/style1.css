@@ -1,0 +1,14 @@
+.students {
+    display: grid;
+    font-family: Arial, sans-serif;
+    font-size: 25px;
+    color: #be2828;
+    grid-template-columns: 100px,100px,100px;
+    gap: 20px;
+}
+
+.student {
+    border: 1px solid black;
+    padding: 20px;
+    text-align: center;
+}
