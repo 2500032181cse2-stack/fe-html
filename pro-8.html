@@ -1,0 +1,394 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Dashboard Profile</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+        }
+
+        /* LOGIN PAGE */
+        .login-page {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            width: 350px;
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-box label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .login-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .hint {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+
+        /* MAIN APPLICATION */
+        .app {
+            display: none;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #1e293b;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar button {
+            padding: 10px 15px;
+            margin-left: 8px;
+            border: none;
+            border-radius: 5px;
+            background: #475569;
+            color: white;
+            cursor: pointer;
+        }
+
+        .navbar button:hover {
+            background: #64748b;
+        }
+
+        .navbar .logout {
+            background: #dc2626;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 40px;
+        }
+
+        .content h1 {
+            margin-bottom: 10px;
+        }
+
+        /* DASHBOARD CARDS */
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            width: 220px;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        /* PROFILE */
+        #profile {
+            display: none;
+            text-align: center;
+        }
+
+        .profile-card {
+            background: white;
+            width: 350px;
+            margin: 30px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+        .profile-image {
+            width: 80px;
+            height: 80px;
+            margin: auto;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+        }
+
+        .profile-card h2 {
+            margin: 20px 0;
+        }
+
+        .profile-card p {
+            margin: 10px;
+        }
+
+        .edit-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN PAGE -->
+    <div class="login-page" id="loginPage">
+
+        <div class="login-box">
+
+            <h1>Login</h1>
+
+            <form onsubmit="login(event)">
+
+                <label>Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Enter username"
+                    required
+                >
+
+                <label>Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter password"
+                    required
+                >
+
+                <button class="login-btn" type="submit">
+                    Login
+                </button>
+
+            </form>
+
+            <p class="hint">
+                Username: <b>admin</b><br>
+                Password: <b>1234</b>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAIN APPLICATION -->
+    <div class="app" id="app">
+
+        <!-- NAVBAR -->
+        <div class="navbar">
+
+            <h2>My Application</h2>
+
+            <div>
+
+                <button onclick="showDashboard()">
+                    Dashboard
+                </button>
+
+                <button onclick="showProfile()">
+                    Profile
+                </button>
+
+                <button class="logout" onclick="logout()">
+                    Logout
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- DASHBOARD -->
+        <div class="content" id="dashboard">
+
+            <h1>Dashboard</h1>
+
+            <p>
+                Welcome to your Dashboard!
+            </p>
+
+            <div class="cards">
+
+                <div class="card">
+                    <h3>Total Users</h3>
+                    <p>120</p>
+                </div>
+
+                <div class="card">
+                    <h3>Projects</h3>
+                    <p>15</p>
+                </div>
+
+                <div class="card">
+                    <h3>Messages</h3>
+                    <p>25</p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROFILE -->
+        <div class="content" id="profile">
+
+            <h1>Profile</h1>
+
+            <div class="profile-card">
+
+                <div class="profile-image">
+                    A
+                </div>
+
+                <h2>Admin User</h2>
+
+                <p>
+                    <b>Username:</b> admin
+                </p>
+
+                <p>
+                    <b>Email:</b> admin@gmail.com
+                </p>
+
+                <p>
+                    <b>Role:</b> Administrator
+                </p>
+
+                <button class="edit-btn">
+                    Edit Profile
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        // LOGIN FUNCTION
+        function login(event) {
+
+            event.preventDefault();
+
+            let username =
+                document.getElementById("username").value;
+
+            let password =
+                document.getElementById("password").value;
+
+            if (username === "admin" && password === "1234") {
+
+                document.getElementById("loginPage").style.display = "none";
+
+                document.getElementById("app").style.display = "block";
+
+            } else {
+
+                alert("Invalid Username or Password");
+
+            }
+        }
+
+
+        // SHOW DASHBOARD
+        function showDashboard() {
+
+            document.getElementById("dashboard").style.display = "block";
+
+            document.getElementById("profile").style.display = "none";
+
+        }
+
+
+        // SHOW PROFILE
+        function showProfile() {
+
+            document.getElementById("dashboard").style.display = "none";
+
+            document.getElementById("profile").style.display = "block";
+
+        }
+
+
+        // LOGOUT
+        function logout() {
+
+            document.getElementById("app").style.display = "none";
+
+            document.getElementById("loginPage").style.display = "flex";
+
+            document.getElementById("username").value = "";
+
+            document.getElementById("password").value = "";
+
+        }
+
+    </script>
+
+</body>
+</html>
+```
